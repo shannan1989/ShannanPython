@@ -3,7 +3,6 @@ import os
 import scrapy
 
 from Meizitu.items import MeizituItem
-from scrapy.crawler import CrawlerProcess
 
 
 class MeizituSpider(scrapy.Spider):
