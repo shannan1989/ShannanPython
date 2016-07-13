@@ -90,4 +90,4 @@ ROBOTSTXT_OBEY = True
 
 DOWNLOAD_DELAY = 1
 ITEM_PIPELINES = {'scrapy.pipelines.images.ImagesPipeline': 1}
-IMAGES_STORE = '/zpc/微云同步盘/meizitu'
+IMAGES_STORE = '/Photo/妹子图'
