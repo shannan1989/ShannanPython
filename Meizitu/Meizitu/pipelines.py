@@ -5,10 +5,12 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import os
-import urllib2
+import urllib
+import socket
 
 from Meizitu import settings
 
+socket.setdefaulttimeout(5.0)
 
 class MeizituPipeline(object):
     def process_item(self, item, spider):
@@ -22,9 +24,16 @@ class MeizituPipeline(object):
             images.append(file_path)
             if os.path.exists(file_path):
                 continue
-            with open(file_path, 'wb') as file_writer:
-                conn = urllib2.urlopen(image_url)  # 下载图片
-                file_writer.write(conn.read())
-            file_writer.close()
+
+            #with open(file_path, 'wb') as file_writer:
+            #    conn = urllib2.urlopen(image_url)  # 下载图片
+            #    file_writer.write(conn.read())
+            #file_writer.close()
+
+            try:
+                urllib.urlretrieve(image_url, file_path)
+            except Exception, e:
+                print 'Exception: ' + e.message
+
         item['images'] = images
         return item
