@@ -23,5 +23,7 @@ class MeizituSpider(scrapy.Spider):
     def parse_item(self, response):
         item = MeizituItem()
         urls = response.xpath("//div[@id='picture']//img/@src").extract()
+        if len(urls) == 0:
+            urls = response.xpath("//div[@class='postContent']//p//img/@src").extract()
         item['image_urls'] = urls
         return item
