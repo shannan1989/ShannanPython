@@ -1,14 +1,14 @@
 # coding=utf-8
 
+import urllib2
+import cookielib
+
 # cookies是某些网站为了辨别用户身份、进行session跟踪而储存在用户本地终端上的数据(通常经过加密)
 # python提供了cookielib模块用于处理cookies
 # cookielib模块的主要作用是提供可存储cookie的对象，以便于与urllib2模块配合使用来访问Internet资源.
 
-import urllib2
-import cookielib
-
 cookie_support = urllib2.HTTPCookieProcessor(cookielib.CookieJar())
-opener = urllib2.build_opener(cookie_support)
+opener = urllib2.build_opener(cookie_support, urllib2.HTTPHandler)
 urllib2.install_opener(opener)
 response = urllib2.urlopen('http://www.baidu.com')
 print response.read()
