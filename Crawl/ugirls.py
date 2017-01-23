@@ -3,6 +3,7 @@
 import os
 import re
 import time
+from multiprocessing.dummy import Pool
 
 import requests
 from lxml import etree
@@ -40,8 +41,10 @@ class UgirlsSpider(object):
 
                 # 获取列表
                 items = html.xpath("//p[@class='p_title']//a/@href")
-                for item in items:
-                    self.parse_item(item)
+                pool = Pool(processes=5)
+                pool.map(self.parse_item, items)
+                pool.close()
+                pool.join()
 
             except Exception, e:
                 print e.message
