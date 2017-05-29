@@ -10,7 +10,7 @@ from lxml import etree
 
 
 class UgirlsSpider(object):
-    save_path = "/Photo/Crawl/Ugirls/"
+    save_path = "/Photo/Ugirls/"
     proxies = {
         # "http": "http://127.0.0.1:56459",
         # "https": "http://127.0.0.1:56459",
@@ -18,7 +18,7 @@ class UgirlsSpider(object):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36'
     }
-    start_url = "http://www.meitulu.com/t/aiyouwu/"
+    start_url = "https://www.meitulu.com/t/aiyouwu/"
 
     def start(self):
         self.parse(self.start_url)
@@ -50,6 +50,8 @@ class UgirlsSpider(object):
                 print e.message
 
     def parse_item(self, url):
+        if url[0] == '/':
+            url = 'https://www.meitulu.com' + url
         r = requests.get(url, allow_redirects=True, proxies=self.proxies, headers=self.headers)
         print str(r.status_code) + ' ' + url
         if r.status_code != 200:
@@ -64,6 +66,9 @@ class UgirlsSpider(object):
                 name = re.sub(u"(?isu)_美图录", u"", name)
                 name = re.sub(u"\[爱尤物\](?isu)", u"[Ugirls]", name)
                 name = re.sub(u"\[Ugirls爱尤物\](?isu)", u"[Ugirls]", name)
+                name = re.sub(u"\[爱尤物Ugirls\](?isu)", u"[Ugirls]", name)
+                name = re.sub(u"(?isu)/(?isu)", u"&", name)
+                name = re.sub(u"(?isu)写真图片(?isu)", u"", name)
                 dir_path = self.save_path + name
                 if not os.path.exists(dir_path):
                     os.makedirs(dir_path)
