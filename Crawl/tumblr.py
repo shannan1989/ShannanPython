@@ -51,8 +51,7 @@ class TumblrSpider(object):
 
                             total = (int)(html.xpath("//posts/@total")[0])
                             dir_path = '/Photo/Crawl/Tumblr/' + title
-                            if not os.path.exists(dir_path):
-                                os.makedirs(dir_path)
+                            dir_ext = '/Photo/Tumblr/' + title
 
                             images = html.xpath("//photo-url[@max-width='1280']")
                             for image in images:
@@ -63,12 +62,21 @@ class TumblrSpider(object):
                                 if os.path.exists(file_path):
                                     continue
 
-                                print image_url
-                                print file_path
-                                ir = requests.get(image_url, proxies=proxies)
-                                if ir.status_code == 200:
-                                    open(file_path, 'wb').write(ir.content)
-                                pass
+                                file_ext = '%s/%s' % (dir_ext, file_name)
+                                if os.path.exists(file_ext):
+                                    continue
+
+                                if not os.path.exists(dir_path):
+                                    os.makedirs(dir_path)
+
+                                print "Fetching " + image_url
+                                try:
+                                    ir = requests.get(image_url, proxies=proxies)
+                                    if ir.status_code == 200:
+                                        open(file_path, 'wb').write(ir.content)
+                                        print "Saved to " + file_path
+                                except Exception, e:
+                                    print "Save Failed: " + str(e.message)
 
                             if self.crawl_video is True:
                                 videos = html.xpath("//video-player")
