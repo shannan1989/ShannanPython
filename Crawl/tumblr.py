@@ -32,7 +32,7 @@ class TumblrSpider(object):
 
             for start_url in self.start_urls:
                 start = 0
-                num = 50
+                num = 15
                 total = 100
                 while start <= total:
                     url = start_url + '?num=' + str(num) + '&start=' + str(start)
