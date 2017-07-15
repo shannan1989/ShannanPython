@@ -56,7 +56,7 @@ class TumblrSpider(object):
 
                         file_path = '%s/%s' % (dir_path, file_name)
                         if os.path.exists(file_path):
-                            continue
+                            os.remove(file_path)
 
                         file_ext = '%s/%s' % (dir_ext, file_name)
                         if os.path.exists(file_ext):
@@ -111,7 +111,7 @@ def crawl(tumblr):
 if __name__ == '__main__':
     start = time.time()
 
-    pool = Pool(processes=5)
+    pool = Pool()
     pool.map(crawl, Tumblrs)
     pool.close()
     pool.join()
