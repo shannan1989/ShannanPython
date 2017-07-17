@@ -56,7 +56,10 @@ class TumblrSpider(object):
 
                         file_path = '%s/%s' % (dir_path, file_name)
                         if os.path.exists(file_path):
-                            os.remove(file_path)
+                            if time.time() - os.path.getctime(file_path) > 60 * 60 * 2:
+                                os.remove(file_path)
+                            else:
+                                continue
 
                         file_ext = '%s/%s' % (dir_ext, file_name)
                         if os.path.exists(file_ext):
@@ -117,4 +120,4 @@ if __name__ == '__main__':
     pool.join()
 
     end = time.time()
-    print end - start
+    print('Finished, spider runs %s seconds.' % (end - start))
