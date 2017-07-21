@@ -2,6 +2,7 @@
 
 import json
 import os
+import sys
 import time
 from multiprocessing import Pool
 
@@ -65,7 +66,7 @@ class TumblrSpider(object):
 
                                 file_path = '%s/%s' % (dir_path, file_name)
                                 if os.path.exists(file_path):
-                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 12:
+                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 6:
                                         os.remove(file_path)
                                     else:
                                         continue
@@ -137,6 +138,11 @@ def crawl(tumblr):
     spider.start()
 
 
+def restart_spider():
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
+
 if __name__ == '__main__':
     start = time.time()
 
@@ -147,3 +153,7 @@ if __name__ == '__main__':
 
     end = time.time()
     print('Finished, spider runs %s seconds.' % (end - start))
+
+    print 'Spider will restart after %ss' % CrawlInterval
+    time.sleep(CrawlInterval)
+    restart_spider()
