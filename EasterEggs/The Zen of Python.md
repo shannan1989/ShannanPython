@@ -1,8 +1,8 @@
-#Python之禅
+# Python之禅
 
 import this 中隐藏了一首《Python之禅》的诗，它是Python中的『八荣八耻』，作者是 Tim Peters ，每个有追求的Python程序员都应该谨记于心。
 
-###参考翻译：
+### 参考翻译：
 
 Beautiful is better than ugly. 
 
