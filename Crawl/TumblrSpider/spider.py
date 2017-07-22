@@ -144,6 +144,7 @@ def restart_spider():
 
 
 if __name__ == '__main__':
+    print 'Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S")
     start = time.time()
 
     pool = Pool()
@@ -152,8 +153,9 @@ if __name__ == '__main__':
     pool.join()
 
     end = time.time()
-    print('Finished, spider runs %s seconds.' % (end - start))
+    print('Spider finishes, run %s seconds.' % (end - start))
 
-    print 'Spider will restart after %ss' % CrawlInterval
+    restart_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end + CrawlInterval))
+    print 'Spider will restart after %ss, at %s.' % (CrawlInterval, restart_time)
     time.sleep(CrawlInterval)
     restart_spider()
