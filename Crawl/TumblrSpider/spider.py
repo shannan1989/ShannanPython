@@ -53,7 +53,9 @@ class TumblrSpider(object):
                     posts = root.find('posts')
                     total = (int)(posts.attrib.get('total'))
 
-                    for post in posts.findall('post'):
+                    post_items = posts.findall('post')
+                    post_items.reverse()
+                    for post in post_items:
                         date = time.strftime("%Y-%m-%d", time.localtime((float)(post.attrib.get('unix-timestamp'))))
                         dir_path = SavedPath + title + '/' + date
                         dir_ext = TumblrPath + title
