@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import time
-from multiprocessing import Pool
+from multiprocessing import Pool  # 进程池
 
 import requests
 from lxml import etree
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     print('Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S"))
     start = time.time()
 
-    pool = Pool()
+    pool = Pool(processes=len(Tumblrs))
     pool.map(crawl, Tumblrs)
     pool.close()
     pool.join()
