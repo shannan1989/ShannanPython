@@ -38,7 +38,7 @@ class TumblrSpider(object):
                 url = self.setting['url'] + '?num=' + str(self.setting['page_size']) + '&start=' + str(start)
                 start += self.setting['page_size']
                 r = requests.get(url, allow_redirects=True, proxies=self.proxies, headers=self.headers)
-                print str(r.status_code) + ' ' + url
+                print(str(r.status_code) + ' ' + url)
                 if r.status_code != 200:
                     continue
                 else:
@@ -68,7 +68,7 @@ class TumblrSpider(object):
 
                                 file_path = '%s/%s' % (dir_path, file_name)
                                 if os.path.exists(file_path):
-                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 6:
+                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 1:
                                         os.remove(file_path)
                                     else:
                                         continue
@@ -81,13 +81,13 @@ class TumblrSpider(object):
                                     os.makedirs(dir_path)
 
                                 try:
-                                    print "Fetching " + image_url
+                                    print("Fetching " + image_url)
                                     ir = requests.get(image_url, proxies=self.proxies)
                                     if ir.status_code == 200:
                                         open(file_path, 'wb').write(ir.content)
-                                        print "Saved to " + dir_path
+                                        print("Saved to " + dir_path)
                                 except Exception, e:
-                                    print "Save Photo Failed: " + str(e.message)
+                                    print("Save Photo Failed: " + str(e.message))
 
                         if self.setting['crawl_video'] is True:
                             for video in post.findall('video-player'):
@@ -108,7 +108,7 @@ class TumblrSpider(object):
 
                                 file_path = '%s/%s' % (dir_path, file_name)
                                 if os.path.exists(file_path):
-                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 12:
+                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 1:
                                         os.remove(file_path)
                                     else:
                                         continue
@@ -121,18 +121,18 @@ class TumblrSpider(object):
                                     os.makedirs(dir_path)
 
                                 try:
-                                    print "Fetching " + video_url
+                                    print("Fetching " + video_url)
                                     vr = requests.get(video_url, proxies=self.proxies)
                                     if vr.status_code == 200:
                                         open(file_path, 'wb').write(vr.content)
-                                        print "Saved to " + file_path
+                                        print("Saved to " + file_path)
                                 except Exception, e:
-                                    print "Save Video Failed: " + str(e.message)
+                                    print("Save Video Failed: " + str(e.message))
 
                 if self.setting['crawl_all'] is False:
                     break
         except Exception, e:
-            print e.message
+            print(e.message)
 
 
 def crawl(tumblr):
@@ -146,7 +146,7 @@ def restart_spider():
 
 
 if __name__ == '__main__':
-    print 'Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S")
+    print('Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S"))
     start = time.time()
 
     pool = Pool()
@@ -158,6 +158,6 @@ if __name__ == '__main__':
     print('Spider finishes, run %s seconds.' % (end - start))
 
     restart_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end + CrawlInterval))
-    print 'Spider will restart after %ss, at %s.' % (CrawlInterval, restart_time)
+    print('Spider will restart after %ss, at %s.' % (CrawlInterval, restart_time))
     time.sleep(CrawlInterval)
     restart_spider()
