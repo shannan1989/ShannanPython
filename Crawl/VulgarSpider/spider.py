@@ -14,7 +14,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 
-class PulpSpider(object):
+class VulgarSpider(object):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36'
     }
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     print('Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S"))
     start = time.time()
 
-    spider = PulpSpider(Categories)
+    spider = VulgarSpider(Categories)
     spider.start()
 
     end = time.time()

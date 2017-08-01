@@ -2,11 +2,11 @@
 
 Categories = [
     {
-        'url': 'http://www.pulp.com/',
+        'url': 'http://www.vulgar.com/',
         'crawl_page': 3
     }
 ]
 
-SavedPath = '/Photo/Crawl/PulpFiction/'
+SavedPath = '/Photo/Crawl/VulgarFiction/'
 
 CrawlInterval = 60 * 60
