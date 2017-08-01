@@ -1,4 +1,5 @@
-# coding=utf-8
+#!/usr/bin/env python
+#  coding=utf-8
 
 import json
 import os
@@ -62,35 +63,17 @@ class TumblrSpider(object):
 
                         for photo in post.iter('photo-url'):
                             if photo.attrib.get('max-width') == '1280':
-                                image_url = photo.text
-                                ts = image_url.split('/')
-                                file_name = ts[len(ts) - 1]
-
-                                file_path = '%s/%s' % (dir_path, file_name)
-                                if os.path.exists(file_path):
-                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 1:
-                                        os.remove(file_path)
-                                    else:
-                                        continue
-
-                                file_ext = '%s/%s' % (dir_ext, file_name)
-                                if os.path.exists(file_ext):
-                                    continue
-
-                                if not os.path.exists(dir_path):
-                                    os.makedirs(dir_path)
-
-                                try:
-                                    print("Fetching " + image_url)
-                                    ir = requests.get(image_url, proxies=self.proxies)
-                                    if ir.status_code == 200:
-                                        open(file_path, 'wb').write(ir.content)
-                                        print("Saved to " + dir_path)
-                                except Exception, e:
-                                    print("Save Photo Failed: " + str(e.message))
+                                self.save_image(photo.text, dir_path, dir_ext)
+                                
+                        for c in post.findall('video-caption'):
+                            figures = etree.HTML(c.text).xpath("//figure[@class='tmblr-full']//img/@src")
+                            for figure in figures:
+                                self.save_image(figure, dir_path, dir_ext)
 
                         if self.setting['crawl_video'] is True:
                             for video in post.findall('video-player'):
+                                if video.text is None:
+                                    continue
                                 video_options = etree.HTML(video.text).xpath("//video/@data-crt-options")
                                 if len(video_options) <= 0:
                                     continue
@@ -108,7 +91,7 @@ class TumblrSpider(object):
 
                                 file_path = '%s/%s' % (dir_path, file_name)
                                 if os.path.exists(file_path):
-                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 1:
+                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 24:
                                         os.remove(file_path)
                                     else:
                                         continue
@@ -132,7 +115,34 @@ class TumblrSpider(object):
                 if self.setting['crawl_all'] is False:
                     break
         except Exception, e:
-            print(e.message)
+            print('Error: ' + e.message)
+
+    def save_image(self, image_url, dir_path, dir_ext):
+        ts = image_url.split('/')
+        file_name = ts[len(ts) - 1]
+
+        file_path = '%s/%s' % (dir_path, file_name)
+        if os.path.exists(file_path):
+            if time.time() - os.path.getctime(file_path) > 60 * 60 * 1:
+                os.remove(file_path)
+            else:
+                return
+
+        file_ext = '%s/%s' % (dir_ext, file_name)
+        if os.path.exists(file_ext):
+            return
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        try:
+            print("Fetching " + image_url)
+            ir = requests.get(image_url, proxies=self.proxies)
+            if ir.status_code == 200:
+                open(file_path, 'wb').write(ir.content)
+                print("Saved to " + dir_path)
+        except Exception, e:
+            print("Save Photo Failed: " + str(e.message))
 
 
 def crawl(tumblr):
