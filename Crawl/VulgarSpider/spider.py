@@ -47,6 +47,7 @@ class VulgarSpider(object):
                 for item in items:
                     file_path = '%s/%s' % (dir_path, item.text + '.txt')
                     if os.path.exists(file_path):
+                        os.utime(file_path, None)
                         continue
 
                     if not os.path.exists(dir_path):
