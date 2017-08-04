@@ -64,7 +64,7 @@ class TumblrSpider(object):
                         for photo in post.iter('photo-url'):
                             if photo.attrib.get('max-width') == '1280':
                                 self.save_image(photo.text, dir_path, dir_ext)
-                                
+
                         for c in post.findall('video-caption'):
                             figures = etree.HTML(c.text).xpath("//figure[@class='tmblr-full']//img/@src")
                             for figure in figures:
@@ -91,10 +91,8 @@ class TumblrSpider(object):
 
                                 file_path = '%s/%s' % (dir_path, file_name)
                                 if os.path.exists(file_path):
-                                    if time.time() - os.path.getctime(file_path) > 60 * 60 * 24:
-                                        os.remove(file_path)
-                                    else:
-                                        continue
+                                    os.utime(file_path, None)
+                                    continue
 
                                 file_ext = '%s/%s' % (dir_ext, file_name)
                                 if os.path.exists(file_ext):
@@ -123,10 +121,8 @@ class TumblrSpider(object):
 
         file_path = '%s/%s' % (dir_path, file_name)
         if os.path.exists(file_path):
-            if time.time() - os.path.getctime(file_path) > 60 * 60 * 1:
-                os.remove(file_path)
-            else:
-                return
+            os.utime(file_path, None)
+            return
 
         file_ext = '%s/%s' % (dir_ext, file_name)
         if os.path.exists(file_ext):
