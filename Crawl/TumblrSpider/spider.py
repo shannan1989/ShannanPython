@@ -107,13 +107,16 @@ class TumblrSpider(object):
                                     if vr.status_code == 200:
                                         open(file_path, 'wb').write(vr.content)
                                         print("Saved to " + file_path)
-                                except Exception, e:
+                                except Exception as e:
                                     print("Save Video Failed: " + str(e.message))
 
                 if self.setting['crawl_all'] is False:
                     break
-        except Exception, e:
-            print('Error: ' + e.message)
+        except Exception as e:
+            if type(e) == requests.exceptions.ConnectionError:
+                print(e)
+            else:
+                print('Error: ' + e.message)
 
     def save_image(self, image_url, dir_path, dir_ext):
         ts = image_url.split('/')
@@ -137,7 +140,7 @@ class TumblrSpider(object):
             if ir.status_code == 200:
                 open(file_path, 'wb').write(ir.content)
                 print("Saved to " + dir_path)
-        except Exception, e:
+        except Exception as e:
             print("Save Photo Failed: " + str(e.message))
 
 
