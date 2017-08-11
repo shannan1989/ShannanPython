@@ -78,7 +78,7 @@ class VulgarSpider(object):
                 except Exception:
                     pass
 
-            except Exception, e:
+            except Exception as e:
                 print('Error: ' + e.message)
 
     def parse_item(self, post):
@@ -110,7 +110,7 @@ class VulgarSpider(object):
                                             f.write('\n')
                                         f.write(node2)
                     print('Saved Novel to ' + post['file_path'])
-            except Exception, e:
+            except Exception as e:
                 print('Save Novel failed: ' + e.message)
                 print(e.args)
 
