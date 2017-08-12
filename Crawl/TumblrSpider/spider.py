@@ -129,6 +129,7 @@ class TumblrSpider(object):
 
         file_ext = '%s/%s' % (dir_ext, file_name)
         if os.path.exists(file_ext):
+            os.utime(file_ext, None)
             return
 
         if not os.path.exists(dir_path):
