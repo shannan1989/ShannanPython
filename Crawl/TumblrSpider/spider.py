@@ -57,6 +57,10 @@ class TumblrSpider(object):
                     post_items = posts.findall('post')
                     post_items.reverse()
                     for post in post_items:
+                        if self.setting['crawl_all'] is False:
+                            if time.time() - (float)(post.attrib.get('unix-timestamp')) > 3600 * 24 * 1.5:
+                                continue
+
                         date = time.strftime("%Y-%m-%d", time.localtime((float)(post.attrib.get('unix-timestamp'))))
                         dir_path = SavedPath + title + '/' + date
                         dir_ext = TumblrPath + title
@@ -66,6 +70,11 @@ class TumblrSpider(object):
                                 self.save_image(photo.text, dir_path, dir_ext)
 
                         for c in post.findall('video-caption'):
+                            figures = etree.HTML(c.text).xpath("//figure[@class='tmblr-full']//img/@src")
+                            for figure in figures:
+                                self.save_image(figure, dir_path, dir_ext)
+
+                        for c in post.findall('regular-body'):
                             figures = etree.HTML(c.text).xpath("//figure[@class='tmblr-full']//img/@src")
                             for figure in figures:
                                 self.save_image(figure, dir_path, dir_ext)
