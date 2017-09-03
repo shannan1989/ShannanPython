@@ -8,7 +8,7 @@ from multiprocessing.dummy import Pool
 import requests
 from lxml import etree
 
-from config import *
+import config
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -40,7 +40,7 @@ class VulgarSpider(object):
                 html = etree.HTML(r.content)
 
                 category = html.xpath("//div[@class='index_box']//h2//center")[0].text
-                dir_path = SavedPath + category
+                dir_path = config.SavedPath + category
 
                 items = html.xpath("//div[@class='zxlist']//ul//li//a")
                 new_items = []
@@ -124,13 +124,13 @@ if __name__ == '__main__':
     print('Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S"))
     start = time.time()
 
-    spider = VulgarSpider(Categories)
+    spider = VulgarSpider(config.Categories)
     spider.start()
 
     end = time.time()
     print('Spider finishes, run %s seconds.' % (end - start))
 
-    restart_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end + CrawlInterval))
-    print('Spider will restart after %ss, at %s.' % (CrawlInterval, restart_time))
-    time.sleep(CrawlInterval)
+    restart_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end + config.CrawlInterval))
+    print('Spider will restart after %ss, at %s.' % (config.CrawlInterval, restart_time))
+    time.sleep(config.CrawlInterval)
     restart_spider()
