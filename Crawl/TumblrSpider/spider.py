@@ -10,7 +10,7 @@ from multiprocessing import Pool  # 进程池
 import requests
 from lxml import etree
 
-from config import *
+import config
 
 try:
     import xml.etree.cElementTree as ET
@@ -26,7 +26,6 @@ class TumblrSpider(object):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36'
     }
-    setting = {}
 
     def __init__(self, tumblr):
         self.setting = tumblr
@@ -58,12 +57,12 @@ class TumblrSpider(object):
                     post_items.reverse()
                     for post in post_items:
                         if self.setting['crawl_all'] is False:
-                            if time.time() - (float)(post.attrib.get('unix-timestamp')) > 3600 * 24 * 1.5:
+                            if time.time() - (float)(post.attrib.get('unix-timestamp')) > 3600 * 24 * 0.5:
                                 continue
 
                         date = time.strftime("%Y-%m-%d", time.localtime((float)(post.attrib.get('unix-timestamp'))))
-                        dir_path = SavedPath + title + '/' + date
-                        dir_ext = TumblrPath + title
+                        dir_path = config.SavedPath + title + '/' + date
+                        dir_ext = config.TumblrPath + title
 
                         for photo in post.iter('photo-url'):
                             if photo.attrib.get('max-width') == '1280':
@@ -168,15 +167,15 @@ if __name__ == '__main__':
     print('Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S"))
     start = time.time()
 
-    pool = Pool(processes=len(Tumblrs))
-    pool.map(crawl, Tumblrs)
+    pool = Pool(processes=len(config.Tumblrs))
+    pool.map(crawl, config.Tumblrs)
     pool.close()
     pool.join()
 
     end = time.time()
     print('Spider finishes, run %s seconds.' % (end - start))
 
-    restart_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end + CrawlInterval))
-    print('Spider will restart after %ss, at %s.' % (CrawlInterval, restart_time))
-    time.sleep(CrawlInterval)
+    restart_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end + config.CrawlInterval))
+    print('Spider will restart after %ss, at %s.' % (config.CrawlInterval, restart_time))
+    time.sleep(config.CrawlInterval)
     restart_spider()
