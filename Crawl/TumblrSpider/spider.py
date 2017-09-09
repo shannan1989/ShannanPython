@@ -97,32 +97,7 @@ class TumblrSpider(object):
                                 else:
                                     video_url = data['hdUrl']
 
-                                ts = video_url.split('/')
-                                if 'tumblr_' in ts[len(ts) - 1]:
-                                    file_name = ts[len(ts) - 1] + '.mp4'
-                                else:
-                                    file_name = ts[len(ts) - 2] + '_' + ts[len(ts) - 1] + '.mp4'
-
-                                file_path = '%s/%s' % (dir_path, file_name)
-                                if os.path.exists(file_path):
-                                    os.utime(file_path, (post_time, post_time))
-                                    continue
-
-                                file_ext = '%s/%s' % (dir_ext, file_name)
-                                if os.path.exists(file_ext):
-                                    continue
-
-                                if not os.path.exists(dir_path):
-                                    os.makedirs(dir_path)
-
-                                try:
-                                    print("Fetching " + video_url)
-                                    vr = requests.get(video_url, proxies=self.proxies)
-                                    if vr.status_code == 200:
-                                        open(file_path, 'wb').write(vr.content)
-                                        print("Saved to " + file_path)
-                                except Exception as e:
-                                    print("Save Video Failed: " + str(e.message))
+                                self.save_video(video_url, dir_path, dir_ext, post_time)
 
                 if self.setting['crawl_all'] is False:
                     break
@@ -157,6 +132,34 @@ class TumblrSpider(object):
                 print("Saved to " + dir_path)
         except Exception as e:
             print("Save Photo Failed: " + str(e.message))
+
+    def save_video(self, video_url, dir_path, dir_ext, post_time):
+        ts = video_url.split('/')
+        if 'tumblr_' in ts[len(ts) - 1]:
+            file_name = ts[len(ts) - 1] + '.mp4'
+        else:
+            file_name = ts[len(ts) - 2] + '_' + ts[len(ts) - 1] + '.mp4'
+
+        file_path = '%s/%s' % (dir_path, file_name)
+        if os.path.exists(file_path):
+            os.utime(file_path, (post_time, post_time))
+            return
+
+        file_ext = '%s/%s' % (dir_ext, file_name)
+        if os.path.exists(file_ext):
+            return
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        try:
+            print("Fetching " + video_url)
+            vr = requests.get(video_url, proxies=self.proxies)
+            if vr.status_code == 200:
+                open(file_path, 'wb').write(vr.content)
+                print("Saved Video to " + file_path)
+        except Exception as e:
+            print("Save Video Failed: " + str(e.message))
 
 
 def crawl(tumblr):
