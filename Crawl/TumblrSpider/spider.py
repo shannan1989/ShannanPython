@@ -56,27 +56,33 @@ class TumblrSpider(object):
                     post_items = posts.findall('post')
                     post_items.reverse()
                     for post in post_items:
+                        post_time = (float)(post.attrib.get('unix-timestamp'))
                         if self.setting['crawl_all'] is False:
-                            if time.time() - (float)(post.attrib.get('unix-timestamp')) > 3600 * 24 * 0.5:
+                            if time.time() - post_time > 3600 * 24 * 0.25:
                                 continue
 
-                        date = time.strftime("%Y-%m-%d", time.localtime((float)(post.attrib.get('unix-timestamp'))))
+                        date = time.strftime("%Y-%m-%d", time.localtime(post_time))
                         dir_path = config.SavedPath + title + '/' + date
                         dir_ext = config.TumblrPath + title
 
                         for photo in post.iter('photo-url'):
                             if photo.attrib.get('max-width') == '1280':
-                                self.save_image(photo.text, dir_path, dir_ext)
+                                self.save_image(photo.text, dir_path, dir_ext, post_time)
+
+                        for c in post.findall('photo-caption'):
+                            figures = etree.HTML(c.text).xpath("//figure[@class='tmblr-full']//img/@src")
+                            for figure in figures:
+                                self.save_image(figure, dir_path, dir_ext, post_time)
 
                         for c in post.findall('video-caption'):
                             figures = etree.HTML(c.text).xpath("//figure[@class='tmblr-full']//img/@src")
                             for figure in figures:
-                                self.save_image(figure, dir_path, dir_ext)
+                                self.save_image(figure, dir_path, dir_ext, post_time)
 
                         for c in post.findall('regular-body'):
                             figures = etree.HTML(c.text).xpath("//figure[@class='tmblr-full']//img/@src")
                             for figure in figures:
-                                self.save_image(figure, dir_path, dir_ext)
+                                self.save_image(figure, dir_path, dir_ext, post_time)
 
                         if self.setting['crawl_video'] is True:
                             for video in post.findall('video-player'):
@@ -99,7 +105,7 @@ class TumblrSpider(object):
 
                                 file_path = '%s/%s' % (dir_path, file_name)
                                 if os.path.exists(file_path):
-                                    os.utime(file_path, None)
+                                    os.utime(file_path, (post_time, post_time))
                                     continue
 
                                 file_ext = '%s/%s' % (dir_ext, file_name)
@@ -126,18 +132,18 @@ class TumblrSpider(object):
             else:
                 print('Error: ' + e.message)
 
-    def save_image(self, image_url, dir_path, dir_ext):
+    def save_image(self, image_url, dir_path, dir_ext, post_time):
         ts = image_url.split('/')
         file_name = ts[len(ts) - 1]
 
         file_path = '%s/%s' % (dir_path, file_name)
         if os.path.exists(file_path):
-            os.utime(file_path, None)
+            os.utime(file_path, (post_time, time.time()))
             return
 
         file_ext = '%s/%s' % (dir_ext, file_name)
         if os.path.exists(file_ext):
-            os.utime(file_ext, None)
+            os.utime(file_ext, (post_time, post_time))
             return
 
         if not os.path.exists(dir_path):
