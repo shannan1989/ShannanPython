@@ -20,8 +20,8 @@ except ImportError:
 
 class TumblrSpider(object):
     proxies = {
-        "http": "http://127.0.0.1:56459",
-        "https": "http://127.0.0.1:56459",
+        # "http": "http://127.0.0.1:56459",
+        # "https": "http://127.0.0.1:56459",
     }
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36'
@@ -52,14 +52,12 @@ class TumblrSpider(object):
 
                     posts = root.find('posts')
                     total = (int)(posts.attrib.get('total'))
+                    total = min(200, total)
 
                     post_items = posts.findall('post')
                     post_items.reverse()
                     for post in post_items:
                         post_time = (float)(post.attrib.get('unix-timestamp'))
-                        if self.setting['crawl_all'] is False:
-                            if time.time() - post_time > 3600 * 24 * 0.25:
-                                continue
 
                         date = time.strftime("%Y-%m-%d", time.localtime(post_time))
                         dir_path = config.SavedPath + title + '/' + date
@@ -111,14 +109,18 @@ class TumblrSpider(object):
         ts = image_url.split('/')
         file_name = ts[len(ts) - 1]
 
-        file_path = '%s/%s' % (dir_path, file_name)
-        if os.path.exists(file_path):
-            os.utime(file_path, (post_time, time.time()))
-            return
-
         file_ext = '%s/%s' % (dir_ext, file_name)
         if os.path.exists(file_ext):
             os.utime(file_ext, (post_time, post_time))
+            return
+
+        if self.setting['crawl_all'] is False:
+            if time.time() - post_time > 3600 * 8:
+                return
+
+        file_path = '%s/%s' % (dir_path, file_name)
+        if os.path.exists(file_path):
+            os.utime(file_path, (post_time, time.time()))
             return
 
         if not os.path.exists(dir_path):
@@ -140,13 +142,18 @@ class TumblrSpider(object):
         else:
             file_name = ts[len(ts) - 2] + '_' + ts[len(ts) - 1] + '.mp4'
 
+        file_ext = '%s/%s' % (dir_ext, file_name)
+        if os.path.exists(file_ext):
+            os.utime(file_ext, (post_time, post_time))
+            return
+
+        if self.setting['crawl_all'] is False:
+            if time.time() - post_time > 3600 * 8:
+                return
+
         file_path = '%s/%s' % (dir_path, file_name)
         if os.path.exists(file_path):
             os.utime(file_path, (post_time, post_time))
-            return
-
-        file_ext = '%s/%s' % (dir_ext, file_name)
-        if os.path.exists(file_ext):
             return
 
         if not os.path.exists(dir_path):
