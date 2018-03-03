@@ -7,10 +7,9 @@ import sys
 import time
 from multiprocessing import Pool  # 进程池
 
+import config
 import requests
 from lxml import etree
-
-import config
 
 try:
     import xml.etree.cElementTree as ET
@@ -45,14 +44,12 @@ class TumblrSpider(object):
                     root = ET.fromstring(r.content)
 
                     tumblelog = root.find('tumblelog')
-                    try:
-                        title = tumblelog.attrib.get('title')
-                    except Exception as e:
+                    title = tumblelog.attrib.get('title')
+                    if title is None:
                         title = tumblelog.attrib.get('name')
 
                     posts = root.find('posts')
-                    total = (int)(posts.attrib.get('total'))
-                    total = min(200, total)
+                    total = min(50, (int)(posts.attrib.get('total')))
 
                     post_items = posts.findall('post')
                     post_items.reverse()
@@ -97,13 +94,10 @@ class TumblrSpider(object):
 
                                 self.save_video(video_url, dir_path, dir_ext, post_time)
 
-                if self.setting['crawl_all'] is False:
-                    break
+                time.sleep(5)
+
         except Exception as e:
-            if type(e) == requests.exceptions.ConnectionError:
-                print(e)
-            else:
-                print('Error: ' + e.message)
+            print('Exception occurs at line ' + e.__traceback__.tb_lineno.__str__(), e)
 
     def save_image(self, image_url, dir_path, dir_ext, post_time):
         ts = image_url.split('/')
@@ -133,7 +127,7 @@ class TumblrSpider(object):
                 open(file_path, 'wb').write(ir.content)
                 print("Saved to " + dir_path)
         except Exception as e:
-            print("Save Photo Failed: " + str(e.message))
+            print("Save Photo Failed: ", e)
 
     def save_video(self, video_url, dir_path, dir_ext, post_time):
         ts = video_url.split('/')
@@ -166,7 +160,7 @@ class TumblrSpider(object):
                 open(file_path, 'wb').write(vr.content)
                 print("Saved Video to " + file_path)
         except Exception as e:
-            print("Save Video Failed: " + str(e.message))
+            print("Save Video Failed: ", e)
 
 
 def crawl(tumblr):
@@ -179,6 +173,19 @@ def restart_spider():
     os.execl(python, python, *sys.argv)
 
 
+def delete_empty_folder(_dir):
+    if not os.path.isdir(_dir):
+        return
+    sub_files = os.listdir(_dir)
+    for d in sub_files:
+        delete_empty_folder(_dir + d + os.path.sep)
+        if d == '.DS_Store':
+            os.remove(_dir + d)
+    if not os.listdir(_dir):
+        os.rmdir(_dir)
+        return
+
+
 if __name__ == '__main__':
     print('Spider starts at ' + time.strftime("%Y-%m-%d %H:%M:%S"))
     start = time.time()
@@ -187,6 +194,8 @@ if __name__ == '__main__':
     pool.map(crawl, config.Tumblrs)
     pool.close()
     pool.join()
+
+    delete_empty_folder(config.SavedPath)
 
     end = time.time()
     print('Spider finishes, run %s seconds.' % (end - start))
